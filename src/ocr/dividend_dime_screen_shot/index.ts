@@ -8,7 +8,7 @@ const config = {
 export async function getDividendJsonFormImage(image: Buffer) {
     return await tesseract.recognize(image, config)
         .then(text => {
-            return createADividendLog(text).toJson()
+            return createADividendLog(text).map(x => x.toJson())
         })
         .catch(error => {
             throw error

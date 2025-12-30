@@ -1,3 +1,4 @@
+import type { Log } from "../share-type.js"
 import { cleanText, filterEmptyWord } from "../util.js"
 import { BuyInvestmentLog } from "./buyInvestment.js"
 import { SellInvestmentLog } from "./sellInvestment.js"
@@ -10,7 +11,7 @@ export interface Vat {
     secFee: number | null,
     tafFee: number | null,
 }
-export interface Investment {
+export interface Investment extends Log {
     symbol: string,
     type: InvestmentType,
     shares: number,
@@ -22,7 +23,6 @@ export interface Investment {
     executedPrice: number,
     stockAmount: number,
     value: number
-    completionDate: Date | null,
 }
 export function createAInvestmentLog(word: string): IInvestmentLog {
     const words = filterEmptyWord(cleanText(word).split('\n'))

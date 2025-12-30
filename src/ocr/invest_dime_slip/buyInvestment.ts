@@ -38,7 +38,7 @@ export class BuyInvestmentLog implements IInvestmentLog {
     toJson(): Investment {
         const [_submissionDate, _completionDate] = extractDatesFromText(this.words)
         const submissionDate = parseDateTimeToDateObject(_submissionDate!)
-        const completionDate = parseDateTimeToDateObject(_completionDate!)
+        const completionDate = parseDateTimeToDateObject(_completionDate!)!
         const executedPrice = getBuyExecutedPrice(this.words)
         const shares = getBuyShares(this.words)
         const price = getBuyPrice(this.words)
