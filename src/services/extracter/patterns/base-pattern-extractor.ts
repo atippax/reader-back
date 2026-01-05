@@ -1,5 +1,5 @@
 export class BasePatternExtractor {
-  constructor(private pattern: RegExp) {}
+  constructor(private pattern: RegExp) { }
   private isHavePattern(text: string) {
     const results = text.match(this.pattern);
     if (results == null) return false;
