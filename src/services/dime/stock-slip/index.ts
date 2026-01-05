@@ -10,7 +10,6 @@ export async function getInvestmentJsonFormImage(image: Buffer) {
   return await tesseract
     .recognize(image, config)
     .then((text) => {
-      console.log(text);
       return createAInvestmentLog(text).toJson();
     })
     .catch((error) => {
