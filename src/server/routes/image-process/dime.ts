@@ -5,19 +5,27 @@ import { DatePatternExtractor } from "../../../services/extracter/patterns/date-
 import { createAInvestmentLog } from "../../../services/dime/stock-slip/core";
 const app = express();
 const dimeHandler: OCRHandler = (req, res) => {
-  const extractorResults = [];
-  for (const text of req.body.texts) {
-    const dateExtractor = new DatePatternExtractor();
-    if (text.includes('Stock Amount')) {
-      extractorResults.push(createAInvestmentLog(text).toJson())
-      continue;
+  try {
+
+    const extractorResults = [];
+    for (const text of req.body.texts) {
+      const dateExtractor = new DatePatternExtractor();
+      if (text.includes('Stock Amount')) {
+        extractorResults.push(createAInvestmentLog(text).toJson())
+        continue;
+      }
+      const extractor = new TransactionExtractor(dateExtractor, text);
+      extractorResults.push(
+        ...extractor.toJson(),
+      );
     }
-    const extractor = new TransactionExtractor(dateExtractor, text);
-    extractorResults.push(
-      ...extractor.toJson(),
-    );
+    console.log('result : ', extractorResults)
+    res.json(extractorResults);
   }
-  res.json(extractorResults);
+  catch (ex) {
+    console.log(ex)
+    res.send(ex)
+  }
 };
 
 app.post("/dime", dimeHandler);
