@@ -8,10 +8,10 @@ const binanceThHandler = (text: string) => {
     try {
         const dateExtractor = new BinanceThTransactionPatternExtractor();
         if (text.toLowerCase().includes('details')) {
-            return [new BinanceThSlip(text).toJson()]
+            return { slip: [new BinanceThSlip(text).toJson()] }
         }
         const extractor = new BinanceThTransaction(dateExtractor, text);
-        return extractor.toJson()
+        return { transaction: extractor.toJson() }
     }
     catch (ex) {
         throw ex

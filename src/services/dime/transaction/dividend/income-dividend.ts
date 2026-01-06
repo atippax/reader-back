@@ -14,6 +14,7 @@ export class IncomeDividendLog implements Parser<Dividend> {
     const value = s[1]!;
     const date = extractDateFromText(this.words);
     return {
+      kind: 'Dividend',
       type: "Income Dividend",
       symbol: symbol,
       amount: Math.abs(+value),

@@ -1,17 +1,26 @@
 
 export type TaskStatus = 'success' | 'process' | 'no-work' | 'waiting'
-class Task<T> {
-    private data: T[] = []
+class Task {
+    private data: Record<string, any> = {}
     private error: string = ''
     private status: TaskStatus = 'no-work'
     constructor(private id: string) {
         this.status = 'waiting'
     }
-    async todos(fns: (() => Promise<T[]>)[]) {
+    async todos(fns: (() => Promise<any>)[]) {
         this.status = 'process'
         try {
             for (const fn of fns) {
-                this.data = [...this.data, ...await fn()]
+                const newData = await fn()
+                const newKeys = Object.keys(newData);
+                for (const newKey of newKeys) {
+                    if (!this.data.hasOwnProperty(newKey)) {
+                        this.data = { [newKey]: newData[newKey], ...this.data }
+                    } else {
+                        this.data = { ...this.data, [newKey]: [...newData[newKey], ...this.data[newKey]] }
+                    }
+
+                }
             }
         }
         catch (ex) {
@@ -38,7 +47,7 @@ class Task<T> {
 }
 
 export class TaskManager {
-    private tasks: Map<string, Task<unknown>> = new Map()
+    private tasks: Map<string, Task> = new Map()
     private queue: Promise<void> = Promise.resolve();
     private currentQueueIndex = 0
     constructor(private maxTasks: number) { }
@@ -55,7 +64,7 @@ export class TaskManager {
         }
         return this.getnumberFormId(lastkey)
     }
-    spawnNewTask(taskType: string, fns: (() => Promise<unknown[]>)[]) {
+    spawnNewTask(taskType: string, fns: (() => Promise<unknown>)[]) {
         const lastKey = parseInt(this.getLastkey()!)
         const taskId = `${taskType}-${lastKey + 1}`
         const task = new Task(taskId)

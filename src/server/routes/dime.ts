@@ -8,11 +8,11 @@ import { TransactionExtractor } from "../../services/dime/transaction/transactio
 const dimeHandler = (text: string) => {
   try {
     if (text.includes('Stock Amount')) {
-      return [createAInvestmentLog(text).toJson()]
+      return { slip: [createAInvestmentLog(text).toJson()] }
     }
     const dateExtractor = new DatePatternExtractor();
     const extractor = new TransactionExtractor(dateExtractor, text);
-    return extractor.toJson()
+    return { ...extractor.toJson() }
   }
   catch (ex) {
     throw ex

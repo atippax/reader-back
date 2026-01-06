@@ -8,7 +8,7 @@ import type { TaskManager } from "../../../services/task/task";
 
 
 
-export default function imageProcessRoute(taskManager: TaskManager, doAfterOcr: (text: string) => unknown[]) {
+export default function imageProcessRoute(taskManager: TaskManager, doAfterOcr: (text: string) => unknown) {
   const app = express();
   const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 },
@@ -27,7 +27,7 @@ export default function imageProcessRoute(taskManager: TaskManager, doAfterOcr: 
         return res.status(400).send("No files were uploaded.");
       }
       console.log('found image file :', files.length)
-      const todos: (() => Promise<unknown[]>)[] = []
+      const todos: (() => Promise<unknown>)[] = []
       for (const file of files) {
         todos.push(async () => {
           const text = await parseImageToText(file.buffer)

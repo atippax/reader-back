@@ -2,8 +2,8 @@ import { extractDateFromText } from "../../../util";
 import type { Stock } from "./stock";
 import type { Parser } from "../parser";
 export class SellStockTransaction implements Parser<Stock> {
-  constructor(private text: string) {}
-  save(): void {}
+  constructor(private text: string) { }
+  save(): void { }
   toJson(): Stock {
     const texts = this.text.split(" ");
     const symbol = texts[1]!;
@@ -12,6 +12,7 @@ export class SellStockTransaction implements Parser<Stock> {
     const price = parseFloat(texts[texts.findIndex((x) => x == "Price") + 1]!);
     return {
       type: "Sell",
+      kind: 'Stock',
       symbol,
       remark: "amount value is estimated value calculated by price * shares",
       completionDate: date,
