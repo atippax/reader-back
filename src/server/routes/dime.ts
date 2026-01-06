@@ -27,8 +27,7 @@ export default function dimeRoute(taskManager: TaskManager) {
   subApp.get('/task/:taskId', (req, res) => {
     const { taskId } = req.params
     const task = taskManager.getTaskId(taskId)
-    if (!task) return res.status(404).send('not found')
-    return res.json(task.getData())
+    return res.json(task)
   })
   app.use("/dime", imageProcessRoute(taskManager, dimeHandler));
   app.use('/dime', subApp)

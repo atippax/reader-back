@@ -17,6 +17,13 @@ app.get("/", (req: Request, res: Response) => {
 const tasks = new TaskManager(20)
 app.use(binanceThRoute(tasks));
 app.use(binanceThRoute(tasks));
+app.use((err: any, req: Request, res: Response, next: Function) => {
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).send({
+    status: statusCode,
+    message: err.message || 'Internal Server Error',
+  });
+});
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });

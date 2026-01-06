@@ -40,10 +40,24 @@ class Task<T> {
 export class TaskManager {
     private tasks: Map<string, Task<unknown>> = new Map()
     private queue: Promise<void> = Promise.resolve();
+    private currentQueueIndex = 0
     constructor(private maxTasks: number) { }
     private readonly TTL = 10 * 60 * 2000;
+    private getnumberFormId(key: string) {
+        const numberOfKey = key.split('-')
+        return numberOfKey[numberOfKey.length - 1]!
+    }
+    private getLastkey() {
+        const keys = Array.from(this.tasks.keys());
+        const lastkey = keys[keys.length - 1]
+        if (!lastkey) {
+            return '0'
+        }
+        return this.getnumberFormId(lastkey)
+    }
     spawnNewTask(taskType: string, fns: (() => Promise<unknown[]>)[]) {
-        const taskId = `${taskType}-${this.tasks.size + 1}`
+        const lastKey = parseInt(this.getLastkey()!)
+        const taskId = `${taskType}-${lastKey + 1}`
         const task = new Task(taskId)
         this.tasks.set(taskId, task)
         if (this.tasks.size >= this.maxTasks) {
@@ -53,6 +67,7 @@ export class TaskManager {
             }
         }
         this.queue = this.queue.then(async () => {
+            this.currentQueueIndex = lastKey
             await task.todos(fns)
             setTimeout(() => {
                 this.killTask(taskId);
@@ -65,6 +80,11 @@ export class TaskManager {
     }
     getTaskId(id: string) {
         const task = this.tasks.get(id)
-        return task
+        if (!task) throw new Error('not found')
+        const clientQueue = parseInt(this.getnumberFormId(id))
+        if (this.currentQueueIndex >= clientQueue) {
+            return { ...task.getData(), waiting: `${0} queues` }
+        }
+        return { ...task.getData(), waiting: `${clientQueue - this.currentQueueIndex} queues` }
     }
 }

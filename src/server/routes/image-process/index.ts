@@ -36,7 +36,7 @@ export default function imageProcessRoute<T>(taskManager: TaskManager, doAfterOc
         })
       }
       const taskId = taskManager.spawnNewTask(req.baseUrl.replace('/', ''), todos)
-      res.json({ taskId })
+      res.json({ taskId, ...taskManager.getTaskId(taskId) })
     })
 
   }

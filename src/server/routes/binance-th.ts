@@ -26,8 +26,7 @@ export default function binanceThRoute(taskManager: TaskManager) {
     subApp.get('/task/:taskId', (req, res) => {
         const { taskId } = req.params
         const task = taskManager.getTaskId(taskId)
-        if (!task) return res.status(404).send('not found')
-        return res.json(task.getData())
+        return res.json(task)
     })
     app.use("/binance-th", imageProcessRoute(taskManager, binanceThHandler));
     app.use('/binance-th', subApp)
