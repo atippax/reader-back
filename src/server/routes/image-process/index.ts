@@ -8,7 +8,7 @@ import type { TaskManager } from "../../../services/task/task";
 
 
 
-export default function imageProcessRoute<T>(taskManager: TaskManager, doAfterOcr: (text: string) => unknown[]) {
+export default function imageProcessRoute(taskManager: TaskManager, doAfterOcr: (text: string) => unknown[]) {
 
   const app = express();
   const upload = multer({
