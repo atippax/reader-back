@@ -1,22 +1,20 @@
 import multer from "multer";
 import express, {
   type Request,
-  type RequestHandler,
   type Response,
 } from "express";
 import { parseImageToText } from "../../../services/ocr";
-import { dimeRouter } from "./dime";
-import { binanceThRouter } from "./binance-th";
-interface OCRBody {
-  texts: string[];
-}
-export type OCRHandler = RequestHandler<any, any, OCRBody>;
-const app = express();
-const upload = multer({
-  limits: { fileSize: 5 * 1024 * 1024 },
-}).array("images", 5);
-function imageHelperMiddleWare(req: Request, res: Response, next: Function) {
-  try {
+import type { TaskManager } from "../../../services/task/task";
+
+
+
+export default function imageProcessRoute<T>(taskManager: TaskManager, doAfterOcr: (text: string) => unknown[]) {
+
+  const app = express();
+  const upload = multer({
+    limits: { fileSize: 5 * 1024 * 1024 },
+  }).array("images", 5);
+  function imageHandler(req: Request, res: Response) {
     return upload(req, res, async (err) => {
       if (err instanceof multer.MulterError) {
         console.error("Multer Error:", err.message);
@@ -29,21 +27,19 @@ function imageHelperMiddleWare(req: Request, res: Response, next: Function) {
       if (!files || files.length === 0) {
         return res.status(400).send("No files were uploaded.");
       }
-      const texts = [];
       console.log('found image file :', files.length)
+      const todos: (() => Promise<unknown[]>)[] = []
       for (const file of files) {
-        const text = await parseImageToText(file.buffer)
-        console.log('cleaned text:', text)
-        texts.push(text);
+        todos.push(async () => {
+          const text = await parseImageToText(file.buffer)
+          return doAfterOcr(text)
+        })
       }
-      req.body.texts = texts;
-      next();
-    });
-  } catch (ex) {
-    return res.status(500).send(ex);
+      const taskId = taskManager.spawnNewTask(req.baseUrl.replace('/', ''), todos)
+      res.json({ taskId })
+    })
+
   }
+  app.post('/image-process', imageHandler);
+  return app
 }
-app.use(imageHelperMiddleWare);
-app.use("/image-process", dimeRouter);
-app.use("/image-process", binanceThRouter);
-export { app as imageProcessDimeRouter };
