@@ -77,7 +77,13 @@ export class TaskManager {
         }
         this.queue = this.queue.then(async () => {
             this.currentQueueIndex = lastKey
-            await task.todos(fns)
+            try {
+
+                await task.todos(fns)
+            }
+            catch (ex) {
+                console.error('background process :\n' + ex)
+            }
             setTimeout(() => {
                 this.killTask(taskId);
             }, this.TTL);
