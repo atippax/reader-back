@@ -19,16 +19,6 @@ const binanceThHandler = (text: string) => {
 };
 export default function binanceThRoute(taskManager: TaskManager) {
     const app = express();
-    const subApp = express()
-    subApp.get('/', (req, res) => {
-        res.send('it a binance controller')
-    })
-    subApp.get('/task/:taskId', (req, res) => {
-        const { taskId } = req.params
-        const task = taskManager.getTaskId(taskId)
-        return res.json(task)
-    })
     app.use("/binance-th", imageProcessRoute(taskManager, binanceThHandler));
-    app.use('/binance-th', subApp)
     return app
 }

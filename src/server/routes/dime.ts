@@ -20,16 +20,6 @@ const dimeHandler = (text: string) => {
 };
 export default function dimeRoute(taskManager: TaskManager) {
   const app = express();
-  const subApp = express()
-  subApp.get('/', (req, res) => {
-    res.send('it a dime controller')
-  })
-  subApp.get('/task/:taskId', (req, res) => {
-    const { taskId } = req.params
-    const task = taskManager.getTaskId(taskId)
-    return res.json(task)
-  })
   app.use("/dime", imageProcessRoute(taskManager, dimeHandler));
-  app.use('/dime', subApp)
   return app
 }

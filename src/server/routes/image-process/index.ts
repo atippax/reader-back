@@ -9,7 +9,6 @@ import type { TaskManager } from "../../../services/task/task";
 
 
 export default function imageProcessRoute(taskManager: TaskManager, doAfterOcr: (text: string) => unknown[]) {
-
   const app = express();
   const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 },

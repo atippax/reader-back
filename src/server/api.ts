@@ -2,6 +2,8 @@ import express, { type Express, type Request, type Response } from "express";
 import cors from "cors";
 import binanceThRoute from "./routes/binance-th";
 import { TaskManager } from "../services/task/task";
+import dimeRoute from "./routes/dime";
+import taskRoute from "./routes/task";
 const app: Express = express();
 const port: number = 8080;
 app.use(cors());
@@ -16,7 +18,8 @@ app.get("/", (req: Request, res: Response) => {
 });
 const tasks = new TaskManager(20)
 app.use(binanceThRoute(tasks));
-app.use(binanceThRoute(tasks));
+app.use(dimeRoute(tasks));
+app.use(taskRoute(tasks));
 app.use(express.json());
 app.use((err: any, req: Request, res: Response, next: Function) => {
   const statusCode = err.statusCode || 500;
