@@ -22,6 +22,7 @@ app.use(dimeRoute(tasks));
 app.use(taskRoute(tasks));
 app.use(express.json());
 app.use((err: any, req: Request, res: Response, next: Function) => {
+  console.error(err.message)
   const statusCode = err.statusCode || 500;
   res.status(statusCode).send({
     status: statusCode,

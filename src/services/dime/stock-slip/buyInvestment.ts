@@ -64,6 +64,7 @@ export class BuyInvestmentLog implements IInvestmentLog {
     const diffPrice = price - stockAmount;
     const diffVat = allVatPrice - diffPrice;
     return {
+      kind: 'slip',
       type: getType(this.words) as InvestmentType,
       symbol: getSymbol(this.words)!,
       stockAmount: stockAmount,
