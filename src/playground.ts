@@ -9,6 +9,8 @@ import { BinanceThTransaction } from "./services/binance-th/transaction/transact
 import { BinanceThTransactionPatternExtractor } from "./services/extracter/patterns/binance-th-transaction-pattern-extractor";
 import { BaseOcrStategy } from "./services/ocr/stategies/base-ocr";
 import { CoordinatesOcrStategy } from "./services/ocr/stategies/coordinates-ocr";
+import { DatePatternExtractor } from "./services/extracter/patterns/date-pattern-extractor";
+import { TransactionExtractor } from "./services/dime/transaction/transaction-extractor";
 
 // fs.readdir("./imageTest/dime", async (err, langFolders) => {
 //   for (const langFolder of langFolders) {
@@ -32,18 +34,23 @@ import { CoordinatesOcrStategy } from "./services/ocr/stategies/coordinates-ocr"
 //     }
 //   }
 // });
-const basePath = "./imageTest/en/transaction"
+const basePath = "./imageTest/dime/en/transactions";
 fs.readdir(basePath, async (err, files) => {
-  if (err) return console.log(err)
+  if (err) return console.log(err);
   for (const file of files) {
     const text = await parseImageToText(
-      await readImageBufferFromPath(
-        `${basePath}/${file}`
-      ), new CoordinatesOcrStategy()
+      await readImageBufferFromPath(`${basePath}/${file}`),
+      new CoordinatesOcrStategy()
     );
-    console.log(new BinanceThTransaction(new BinanceThTransactionPatternExtractor(), text).toJson())
+    if (text.includes("Stock Amount")) {
+      console.log({ slip: [createAInvestmentLog(text).toJson()] });
+      continue;
+    }
+    const dateExtractor = new DatePatternExtractor();
+    const extractor = new TransactionExtractor(dateExtractor, text);
+    console.log({ ...extractor.toJson() });
   }
-})
+});
 
 // const text = await parseImageToText(
 //   await readImageBufferFromPath(
