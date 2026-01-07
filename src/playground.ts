@@ -1,9 +1,14 @@
 import fs from "fs";
 import {
+  forNormal,
+  forPositionOcr,
   parseImageToText,
   readImageBufferFromPath,
 } from "./services/ocr/index";
 import { BinanceThSlip } from "./services/binance-th/slip/slip";
+import { createAInvestmentLog } from "./services/dime/stock-slip/core";
+import { BinanceThTransaction } from "./services/binance-th/transaction/transaction";
+import { BinanceThTransactionPatternExtractor } from "./services/extracter/patterns/binance-th-transaction-pattern-extractor";
 
 // fs.readdir("./imageTest/dime", async (err, langFolders) => {
 //   for (const langFolder of langFolders) {
@@ -27,19 +32,25 @@ import { BinanceThSlip } from "./services/binance-th/slip/slip";
 //     }
 //   }
 // });
-const basePath = "./imageTest/en/transaction"
-fs.readdir(basePath, async (err, files) => {
-  if (err) return console.log(err)
-  for (const file of files) {
-    const text = await parseImageToText(
-      await readImageBufferFromPath(
-        `${basePath}/${file}`
-      )
-    );
-    console.log(new BinanceThSlip(text).toJson())
-  }
-})
+// const basePath = "./imageTest/en/transaction"
+// fs.readdir(basePath, async (err, files) => {
+//   if (err) return console.log(err)
+//   for (const file of files) {
+//     const text = await parseImageToText(
+//       await readImageBufferFromPath(
+//         `${basePath}/${file}`
+//       ), forNormal()
+//     );
+//     console.log(new BinanceThTransaction(new BinanceThTransactionPatternExtractor(), text).toJson())
+//   }
+// })
 
+// const text = await parseImageToText(
+//   await readImageBufferFromPath(
+//     `imageTest/1000000974.jpg`
+//   )
+// );
+// console.log(createAInvestmentLog(text).toJson())
 
 // const paragraphs = `
 // 1+2  1+4  1+5

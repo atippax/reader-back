@@ -1,3 +1,4 @@
+import type { BasePatternExtractor } from "../../extracter/patterns/base-pattern-extractor";
 import {
   extractDatesFromText,
   findWordUseNextLine,
@@ -14,54 +15,54 @@ import { getSymbol, getType, sumVat } from "./util";
 
 function getSellShares(words: string[]) {
   return parseFloat(
-    words.find((w) => w.includes("Shares"))?.replace("Shares", "")!
+    words[words.findIndex(x => x == 'Shares') - 1]!
   );
 }
 
 function getSellExecutedPrice(words: string[]) {
-  return parseFloat(
-    words
-      .find((w) => w.includes("Executed Price"))
-      ?.replace("Executed Price", "")
-      .replace("USD", "")!
-  );
+  const index = words.findIndex(x => x == 'Executed')
+  if (!index) throw new Error('not found Execute Price')
+  return parseFloat(words[index + 2]!)
 }
 
 function getVatSellCommission(words: string[]) {
-  return parseUsd(findWordUseNextLine(words, "Commission Fee")!);
+  return parseFloat(words[words.findIndex(x => x == 'Commission') + 2]!)
 }
 function getVat7(words: string[]) {
-  return parseUsd(findWordUseNextLine(words, "VAT 7%")!);
+  return parseFloat(words[words.findIndex(x => x == 'VAT') + 2]!)
 }
 function getVatSEC(words: string[]) {
-  return parseUsd(findWordUseNextLine(words, "SEC Fee")!);
+  return parseFloat(words[words.findIndex(x => x == 'SEC') + 2]!)
 }
 function getVatTAF(words: string[]) {
-  return parseUsd(findWordUseNextLine(words, "TAF Fee")!);
+  return parseFloat(words[words.findIndex(x => x == 'TAF') + 2]!)
 }
 function getStockAmount(words: string[]) {
-  return parseUsd(findWordUseNextLine(words, "Stock Amount")!);
+  return parseFloat(words[words.findIndex(x => x == 'Amount') + 1]!)
 }
 function getPrice(words: string[]) {
-  return parseUsd(findWordUseNextLine(words, "Total Credit")!);
+  return parseFloat(words[words.findIndex(x => x == 'Credit') + 1]!)
 }
 
 export class SellInvestmentLog implements IInvestmentLog {
-  constructor(private words: string[]) { }
+  constructor(private words: string, private extractor: BasePatternExtractor) { }
   toJson(): Investment {
-    const [_submissionDate, _completionDate] = extractDatesFromText(this.words);
+    const texts = this.extractor.extract(this.words)
+    const [frontText, _completionDate] = extractDatesFromText(texts);
+    const [word, _submissionDate] = frontText?.split('Submission Date')!
     const submissionDate = parseDateTimeToDateObject(_submissionDate!);
-    const completionDate = parseDateTimeToDateObject(_completionDate!)!;
-    const executedPrice = getSellExecutedPrice(this.words);
-    const shares = getSellShares(this.words);
-    const stockAmount = getStockAmount(this.words);
+    const completionDate = parseDateTimeToDateObject(_completionDate?.split('Completion date')[1]!)!;
+    const words = word?.split(' ')!
+    const executedPrice = getSellExecutedPrice(words);
+    const shares = getSellShares(words);
+    const stockAmount = getStockAmount(words);
     const vat: Vat = {
-      commissionFee: getVatSellCommission(this.words),
-      secFee: getVatSEC(this.words),
-      tafFee: getVatTAF(this.words),
-      vat7: getVat7(this.words),
+      commissionFee: getVatSellCommission(words),
+      secFee: getVatSEC(words),
+      tafFee: getVatTAF(words),
+      vat7: getVat7(words),
     };
-    const price = getPrice(this.words);
+    const price = getPrice(words);
     const allVatPrice = sumVat(vat);
     const diffPrice = stockAmount - price;
     const diffVat = diffPrice - allVatPrice;

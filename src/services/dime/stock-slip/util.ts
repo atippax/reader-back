@@ -25,21 +25,17 @@ export function getShares(word: string) {
   return 0.0;
 }
 
-export function getSymbol(words: string[]) {
-  const index = words.findIndex((w) => isSellType(w) || isBuyType(w));
-  if (index == -1) return "-";
+export function getSymbol(words: string) {
   const type = getType(words);
-  const thisWordHasSymbol = words[index];
+  const thisWordHasSymbol = words;
   const thisSymbolHere = thisWordHasSymbol?.split(type)[1]!.split(" ")[1];
   return thisSymbolHere;
 }
 
-export function getType(words: string[]) {
-  const index = words.findIndex((w) => isSellType(w) || isBuyType(w));
-  if (index == -1) return "-";
-  if (isSellType(words[index]!)) {
+export function getType(word: string) {
+  if (isSellType(word)) {
     return "Sell";
-  } else if (isBuyType(words[index]!)) {
+  } else if (isBuyType(word)) {
     return "Buy";
   }
   return "-";

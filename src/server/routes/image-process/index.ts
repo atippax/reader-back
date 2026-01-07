@@ -3,7 +3,7 @@ import express, {
   type Request,
   type Response,
 } from "express";
-import { parseImageToText } from "../../../services/ocr";
+import { forPositionOcr, parseImageToText } from "../../../services/ocr";
 import type { TaskManager } from "../../../services/task/task";
 
 
@@ -30,7 +30,7 @@ export default function imageProcessRoute(taskManager: TaskManager, doAfterOcr: 
       const todos: (() => Promise<unknown>)[] = []
       for (const file of files) {
         todos.push(async () => {
-          const text = await parseImageToText(file.buffer)
+          const text = await parseImageToText(file.buffer, forPositionOcr())
           return doAfterOcr(text)
         })
       }

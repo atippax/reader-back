@@ -1,5 +1,5 @@
-export function filterEmptyWord(words: string[]) {
-  return words.filter((w) => w != "");
+export function filterEmptyWord(words: string) {
+  // return words.filter((w) => w != "");
 }
 
 export function defaultZero(value: number | null) {

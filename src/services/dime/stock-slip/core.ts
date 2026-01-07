@@ -1,3 +1,5 @@
+import { BasePatternExtractor } from "../../extracter/patterns/base-pattern-extractor";
+import { DatePatternExtractor } from "../../extracter/patterns/date-pattern-extractor";
 import { cleanText, filterEmptyWord } from "../../util";
 import type { Transaction } from "../transaction/transaction";
 import { BuyInvestmentLog } from "./buyInvestment";
@@ -25,13 +27,13 @@ export interface Investment extends Transaction {
   value: number;
 }
 export function createAInvestmentLog(word: string): IInvestmentLog {
-  const words = filterEmptyWord(cleanText(word).split("\n"));
+  const words = cleanText(word);
   const type = getType(words) as InvestmentType;
   switch (type) {
     case "Sell":
-      return new SellInvestmentLog(words);
+      return new SellInvestmentLog(words, new BasePatternExtractor(/(?<=\d{1,2}\s[A-Z][a-z]{2}\s\d{4}\s-\s\d{2}:\d{2})/g));
     case "Buy":
-      return new BuyInvestmentLog(words);
+      return new BuyInvestmentLog([words]);
     default:
       throw Error("no type");
   }
