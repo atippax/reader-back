@@ -1,3 +1,4 @@
+import type { BasePatternExtractor } from "../../extracter/patterns/base-pattern-extractor";
 import {
   extractDatesFromText,
   findSame,
@@ -24,42 +25,53 @@ function getBuyShares(words: string[]) {
   return parseFloat(words[indexFoundShares + (isCanParse ? 2 : 3)]!);
 }
 function getBuyExecutedPrice(words: string[]) {
-  const prices = findSame(words, "USD");
-  return parseUsd(prices[1]!);
+  const index = words.findIndex(x => x == 'Executed')
+  if (!index) throw new Error('not found Execute Price')
+  return parseFloat(words[index + 2]!)
+  // const prices = findSame(words, "USD");
+  // return parseUsd(prices[1]!);
 }
 function getVatSellCommission(words: string[]) {
+  return parseFloat(words[words.findIndex(x => x == 'Commission') + 2]!)
   return parseUsd(findWordUseNextLine(words, "Commission Fee")!);
 }
 function getVat7(words: string[]) {
+  return parseFloat(words[words.findIndex(x => x == 'VAT') + 2]!)
   return parseUsd(findWordUseNextLine(words, "VAT 7%")!);
 }
 function getVatSEC(words: string[]) {
+  return parseFloat(words[words.findIndex(x => x == 'SEC') + 2]!)
   return parseUsd(findWordUseNextLine(words, "SEC Fee")!);
 }
 function getVatTAF(words: string[]) {
+  return parseFloat(words[words.findIndex(x => x == 'TAF') + 2]!)
   return parseUsd(findWordUseNextLine(words, "TAF Fee")!);
 }
 function getStockAmount(words: string[]) {
+  return parseFloat(words[words.findIndex(x => x == 'Amount') + 1]!)
   return parseUsd(findWordUseNextLine(words, "Stock Amount")!);
 }
 export class BuyInvestmentLog implements IInvestmentLog {
-  constructor(private words: string[]) {
+  constructor(private words: string, private extractor: BasePatternExtractor) {
     console.log(words);
   }
   toJson(): Investment {
-    const [_submissionDate, _completionDate] = extractDatesFromText(this.words);
+    const texts = this.extractor.extract(this.words)
+    const [frontText, _completionDate] = extractDatesFromText(texts);
+    const [word, _submissionDate] = frontText?.split('Submission Date')!
     const submissionDate = parseDateTimeToDateObject(_submissionDate!);
-    const completionDate = parseDateTimeToDateObject(_completionDate!)!;
-    const executedPrice = getBuyExecutedPrice(this.words);
-    const shares = getBuyShares(this.words);
-    const price = getBuyPrice(this.words);
+    const completionDate = parseDateTimeToDateObject(_completionDate?.split('Completion date')[1]!)!;
+    const words = word?.split(' ')!
+    const executedPrice = getBuyExecutedPrice(words);
+    const shares = getBuyShares(words);
+    const price = getBuyPrice(words);
     const vat: Vat = {
-      commissionFee: getVatSellCommission(this.words),
-      secFee: getVatSEC(this.words),
-      tafFee: getVatTAF(this.words),
-      vat7: getVat7(this.words),
+      commissionFee: getVatSellCommission(words),
+      secFee: getVatSEC(words),
+      tafFee: getVatTAF(words),
+      vat7: getVat7(words),
     };
-    const stockAmount = getStockAmount(this.words);
+    const stockAmount = getStockAmount(words);
     const allVatPrice = sumVat(vat);
     const diffPrice = price - stockAmount;
     const diffVat = allVatPrice - diffPrice;

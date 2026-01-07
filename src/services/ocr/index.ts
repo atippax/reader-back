@@ -45,8 +45,8 @@ export function forPositionOcr(): For {
         if (lastCenterY === -1 || Math.abs(item.centerY - lastCenterY) > rowThreshold) {
           if (currentRow.length > 0) {
             // ก่อนขึ้นบรรทัดใหม่ ให้เรียงซ้ายไปขวา (left) ในบรรทัดเดิมก่อน
-            currentRow.sort((a, b) => a.left - b.left)
-            finalRows.push(currentRow.map(i => i.text).join(" "))
+            currentRow.sort((a: any, b: any) => a.left - b.left)
+            finalRows.push(currentRow.map((i: any) => i.text).join(" "))
           }
           currentRow = [item]
           lastCenterY = item.centerY
@@ -57,8 +57,8 @@ export function forPositionOcr(): For {
 
       // บรรทัดสุดท้าย
       if (currentRow.length > 0) {
-        currentRow.sort((a, b) => a.left - b.left)
-        finalRows.push(currentRow.map(i => i.text).join(" "))
+        currentRow.sort((a: any, b: any) => a.left - b.left)
+        finalRows.push(currentRow.map((i: any) => i.text).join(" "))
       }
 
       const text = finalRows.join("\n")

@@ -29,16 +29,8 @@ class Task {
         this.status = 'success'
 
     }
-    setStatus(status: TaskStatus) {
-        this.status = status
-    }
-
     getid() {
         return this.id
-    }
-    setError(error: string) {
-        this.error = error
-        this.setStatus('success')
     }
     getData() {
         if (this.error != '') throw new Error(this.error)

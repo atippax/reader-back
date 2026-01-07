@@ -33,7 +33,7 @@ export function createAInvestmentLog(word: string): IInvestmentLog {
     case "Sell":
       return new SellInvestmentLog(words, new BasePatternExtractor(/(?<=\d{1,2}\s[A-Z][a-z]{2}\s\d{4}\s-\s\d{2}:\d{2})/g));
     case "Buy":
-      return new BuyInvestmentLog([words]);
+      return new BuyInvestmentLog(words, new BasePatternExtractor(/(?<=\d{1,2}\s[A-Z][a-z]{2}\s\d{4}\s-\s\d{2}:\d{2})/g));
     default:
       throw Error("no type");
   }
