@@ -21,17 +21,7 @@ export function forPositionOcr(): For {
       lines.forEach((line, index) => {
         const columns = line.split("\t").map(x => x.replace('\r', ''))
         if (index > 0 && columns.length > 11) {
-          const text = columns[11]!.trim()
-          const top = parseInt(columns[7]!)
-          const height = parseInt(columns[9]!) // ดึงค่าความสูงมาด้วย
-          const left = parseInt(columns[6]!)   // ดึงค่าแนวนอนมาด้วย
-
-          if (text !== "") {
-            // ใช้ค่ากึ่งกลาง (Center Y) แทน Top
-            const centerY = top + (height / 2)
-            // results.push({ text, centerY, left })
-            results.push(keys.reduce((s, x, i) => ({ ...s, [x]: columns[i] }), {} as any))
-          }
+          results.push(keys.reduce((s, x, i) => ({ ...s, [x]: columns[i] }), {} as any))
         }
         else {
           if (keys.length == 0)
